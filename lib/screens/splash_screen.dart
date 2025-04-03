@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chatapp_qualwebs_assignment/data/preference_helper.dart';
+import 'package:flutter_chatapp_qualwebs_assignment/screens/all_chats_screen.dart';
 import 'package:flutter_chatapp_qualwebs_assignment/screens/sign_in_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -10,8 +12,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,10 +26,20 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-        Future.delayed(Duration(seconds: 5),(){
-          Navigator.pushReplacement(context, 
-          MaterialPageRoute(builder: (context) => SignInScreen())
-          );
+    PreferenceHelper preferenceHelper=PreferenceHelper();
+        Future.delayed(Duration(seconds: 5),() async {
+          if(await preferenceHelper.isLoggedIn()){
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => AllChatsScreen())
+            );
+
+          }else {
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => SignInScreen())
+            );
+
+          }
+
     });
   }
 }
