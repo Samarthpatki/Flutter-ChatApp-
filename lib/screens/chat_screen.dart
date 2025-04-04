@@ -360,6 +360,7 @@ void _showMessageOptions(String messageId, String message ) {
     return Scaffold(
       appBar: AppBar(
           title: Row(
+
             children: [
               // Profile Image
               Container(
@@ -374,8 +375,10 @@ void _showMessageOptions(String messageId, String message ) {
                       ? Image.memory(
                     base64Decode(widget.receiverPic),
                     fit: BoxFit.cover,
+                    width: 40,
+                      height: 40,
                   )
-                      : Icon(Icons.account_circle, size: 40), // Default icon
+                      : Image.asset("assets/images/profile.png"), // Default icon
                 ),
               ),
               SizedBox(width: 10), // Spacing
@@ -480,10 +483,26 @@ void _showMessageOptions(String messageId, String message ) {
             child: Row(
               children: [
                 Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: InputDecoration(hintText: "Type a message"),
+                  child:
+                  Container(
+                        decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(25),
+                  boxShadow: [
+                    BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 3,
+                  offset: Offset(0, 2),
                   ),
+                  ],
+                          ) ,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child:                   TextField(
+                      controller: _messageController,
+                      decoration: InputDecoration(hintText: "Type a message",border: InputBorder.none),
+                    ),
+
+                    ) ,
                 ),
                 IconButton(onPressed:(){
                   showImagePickerDialog(context);

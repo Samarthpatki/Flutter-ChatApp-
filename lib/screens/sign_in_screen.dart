@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chatapp_qualwebs_assignment/data/sign_in_up_repo.dart';
 import 'package:flutter_chatapp_qualwebs_assignment/screens/all_chats_screen.dart';
@@ -24,6 +25,8 @@ class _SignInScreenState extends State<SignInScreen> {
   bool isLoading = false;
   final AuthRepository authObj= AuthRepository();
   final prefs = PreferenceHelper();
+  bool _hidePassword = true;
+
 
   void onSignInPressed() {
     setState(() {
@@ -103,7 +106,12 @@ class _SignInScreenState extends State<SignInScreen> {
     List<Permission> permissions = [Permission.camera];
 
     if (Platform.isAndroid) {
-      if (Platform.version.compareTo("13") < 0) {
+      print("version"+Platform.version);
+      final deviceInfo = DeviceInfoPlugin();
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      int sdkInt = androidInfo.version.sdkInt;
+
+      if (sdkInt <= 32) {
         permissions.add(Permission.storage); // For Android 12 and below
       } else {
         permissions.add(Permission.photos); // For Android 13+
@@ -162,7 +170,6 @@ class _SignInScreenState extends State<SignInScreen> {
   Future<void> pickImage(ImageSource source, BuildContext context, Function(File) onImageSelected) async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: source);
-
     if (pickedFile != null) {
       File imageFile = File(pickedFile.path);
       onImageSelected(imageFile);
@@ -229,9 +236,10 @@ class _SignInScreenState extends State<SignInScreen> {
                   keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 10),
+
                 TextField(
                   controller: passwordController,
-                  obscureText: true,
+                  obscureText: _hidePassword,
                   decoration: InputDecoration(
                     hintText: 'Enter password',
                     hintStyle: TextStyle(color: Colors.grey),
@@ -241,6 +249,16 @@ class _SignInScreenState extends State<SignInScreen> {
                       borderRadius: BorderRadius.circular(10),
                       borderSide: BorderSide.none,
                     ),
+                    suffixIcon: IconButton(onPressed: (){
+                      setState(() {
+                        _hidePassword = !_hidePassword;
+                      });
+
+                    }, icon: Icon(
+                     _hidePassword ? Icons.visibility_off : Icons.visibility
+
+                    )),
+
                     contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
                   ),
                 ),

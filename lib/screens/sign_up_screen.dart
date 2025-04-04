@@ -23,7 +23,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController confirmPasswordController = TextEditingController();
   bool isLoading = false;
   String _profileImage ="";
-
+  bool hidePass =true;
+  bool hideConfirmPass=true;
   final AuthRepository auth_obj = AuthRepository();
 
   void showImagePickerDialog(BuildContext context, Function(File) onImageSelected) {
@@ -134,13 +135,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       String base64img=await convertToBase64(selectedImage);
                       setState(() {
                         _profileImage=base64img;
+                        print("PIC "+_profileImage);
                       });
                   });
 
                 },
                 child: CircleAvatar(
                   radius: 75,
-                  // backgroundImage: _profileImage != "" ? MemoryImage(base64Decode(_profileImage)) : AssetImage('assets/images/profile.png') as ImageProvider,
+                  backgroundImage: _profileImage != "" ? MemoryImage(base64Decode(_profileImage)) : null,
                   child: _profileImage == "" ? Icon(Icons.camera_alt, size: 40, color: Colors.white) : null,
                 ),
               ),
@@ -149,8 +151,64 @@ class _SignUpScreenState extends State<SignUpScreen> {
             _buildTextField(nameController, 'Full Name', TextInputType.text),
             _buildTextField(emailController, 'Email ID', TextInputType.emailAddress),
             _buildTextField(numberController, 'Mobile Number', TextInputType.phone),
-            _buildTextField(passwordController, 'Enter Password', TextInputType.visiblePassword, obscureText: true),
-            _buildTextField(confirmPasswordController, 'Confirm Password', TextInputType.visiblePassword, obscureText: true),
+
+          Padding(
+            padding: EdgeInsets.only(bottom: 10),
+            child: TextField(
+              controller: passwordController,
+              obscureText: hidePass,
+              keyboardType: TextInputType.visiblePassword,
+              decoration: InputDecoration(
+                hintText: "Enter Password",
+                hintStyle: TextStyle(color: Colors.grey),
+                filled: true,
+                fillColor: Colors.grey[200],
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                suffixIcon:  IconButton(
+                  icon: Icon(
+                    hidePass ? Icons.visibility_off : Icons.visibility,
+                    color: Colors.grey,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      hidePass = !hidePass;
+                    });
+                  },
+                )
+
+              ),
+            ),
+             ),
+           Padding(
+            padding: EdgeInsets.only(bottom: 10),
+            child: TextField(
+              controller: confirmPasswordController,
+              obscureText: hideConfirmPass,
+              keyboardType: TextInputType.visiblePassword,
+              decoration: InputDecoration(
+                hintText: "Confirm Password",
+                hintStyle: TextStyle(color: Colors.grey),
+                filled: true,
+                fillColor: Colors.grey[200],
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                  suffixIcon:  IconButton(
+                    icon: Icon(
+                      hideConfirmPass ? Icons.visibility_off : Icons.visibility,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        hideConfirmPass = !hideConfirmPass;
+                      });
+                    },
+                  )
+              ),
+            ),
+          ),
+
+
+            // _buildTextField(passwordController, 'Enter Password', TextInputType.visiblePassword, obscureText: hidePass),
+            // _buildTextField(confirmPasswordController, 'Confirm Password', TextInputType.visiblePassword, obscureText: hideConfirmPass),
             SizedBox(height: 20),
             isLoading
                 ? Center(child: CircularProgressIndicator())

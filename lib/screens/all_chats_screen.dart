@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_chatapp_qualwebs_assignment/screens/profile_screen.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../data/preference_helper.dart';
 import '../data/sign_in_up_repo.dart';
@@ -136,6 +135,8 @@ class _AllChatsScreenState extends State<AllChatsScreen> {
 
 
   Future<void> _startChatActivity(ChatPreview chat) async {
+    if (!mounted) return; // ensure widget is still active
+
     UserProfile userProfile = UserProfile(
       uid: chat.userId,
       name: chat.name,
@@ -145,6 +146,8 @@ class _AllChatsScreenState extends State<AllChatsScreen> {
     );
 
     String? userid = await preferenceHelper.getUserID();
+    if (!mounted) return; // ensure widget is still active
+
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => ChatScreen(senderId:userid ?? "" ,receiverId: userProfile.uid,receiverName: userProfile.name,receiverPic: userProfile.profilePic,)),
@@ -155,7 +158,7 @@ class _AllChatsScreenState extends State<AllChatsScreen> {
     TextEditingController searchController = TextEditingController();
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
           title: Text("Search User"),
           content: TextField(
@@ -171,11 +174,12 @@ class _AllChatsScreenState extends State<AllChatsScreen> {
               onPressed: () {
                 String queryText = searchController.text.trim();
                 if (queryText.isNotEmpty) {
-                  Navigator.pop(context);
+                  Navigator.pop(dialogContext);
                   // Implement search logic
                   searchUserQueryCall(queryText, (
                       user
                 ){
+                    if (user == null || !mounted) return;
 
                     Navigator.push(context,
                       MaterialPageRoute(builder: (context) => ChatScreen(senderId:userId??""  ,receiverId:user!.uid ,receiverName: user.name, receiverPic: user.profilePic, )));
@@ -183,6 +187,7 @@ class _AllChatsScreenState extends State<AllChatsScreen> {
                 }, (
                     error
                   ){
+                    if (!mounted) return;
                     print(error);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text("Error $error")),
@@ -206,6 +211,7 @@ class _AllChatsScreenState extends State<AllChatsScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         elevation: 2,
+        toolbarHeight: 85,
         title: Text("Chats",
         style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
 
